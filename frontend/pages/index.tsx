@@ -3,21 +3,21 @@ import { gql } from "graphql-request";
 import { client } from "./api/hello";
 
 const GetInfo = gql`
-  query {
+  query MyQuery {
     info {
-      id
-      name
       email
+      name
     }
   }
 `;
 
+type InfoType = {
+  email: string;
+  name: string;
+};
+
 interface Info {
-  info: {
-    id: number;
-    name: string;
-    email: string;
-  };
+  info: [InfoType];
 }
 
 async function getInfo() {
@@ -27,11 +27,11 @@ async function getInfo() {
   } catch (error) {
     console.error("Error fetching info", error);
   }
-  return response;
+  return response ? response?.info : [];
 }
 
 export default function Home() {
-  const [Info, setInfo] = useState<Info>();
+  const [Info, setInfo] = useState<InfoType[]>([]);
 
   useEffect(() => {}, []);
 
@@ -52,7 +52,16 @@ export default function Home() {
       >
         Get Info
       </button>
-      <div>{Info?.info.email}</div>
+      <div>
+        {Info.map((info) => {
+          return (
+            <div key={info.email}>
+              <div>{info.email}</div>
+              <div>{info.name}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
